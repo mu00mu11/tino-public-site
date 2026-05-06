@@ -1,30 +1,22 @@
 @import "tailwindcss";
 
-:root {
-  --bg: #ffffff;
-  --fg: #0a0a0a;
-  --muted: #6b7280;
-  --line: #e5e7eb;
-  --accent: #1b2244;
-  --accent-soft: #f5f6fa;
-  --danger: #c8102e;
-}
-
+/* 色は src/lib/tokens.ts の COLOR を真ソースとする。
+   ここでは tokens.ts と同期した値だけを @theme inline に直接定義し、
+   :root 変数の二重管理を排除する。tokens.ts を変更したら同じ値をここに反映する */
 @theme inline {
-  --color-background: var(--bg);
-  --color-foreground: var(--fg);
-  --color-muted: var(--muted);
-  --color-line: var(--line);
-  --color-accent: var(--accent);
-  --color-accent-soft: var(--accent-soft);
-  --color-danger: var(--danger);
+  --color-background: #ffffff;
+  --color-foreground: #0a0a0a;
+  --color-muted: #6b7280;
+  --color-line: #e5e7eb;
+  --color-accent: #1b2244;
+  --color-danger: #c8102e;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 html, body {
-  background: var(--bg);
-  color: var(--fg);
+  background: #ffffff;
+  color: #0a0a0a;
 }
 
 body {

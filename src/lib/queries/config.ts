@@ -5,7 +5,7 @@ import { DEFAULT_THRESHOLDS } from '@/lib/thresholds'
 export async function fetchSiteConfig(): Promise<SiteConfig> {
   const { data } = await supabase
     .from('public_site_config_view')
-    .select('*')
+    .select('is_published, calendar_thresholds, show_drink_count, show_shot_count')
     .limit(1)
     .maybeSingle()
   return (data as SiteConfig | null) ?? {
