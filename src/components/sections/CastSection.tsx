@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import { SectionHeading } from '@/components/ui/SectionHeading'
-import { COLOR, FONT, LAYOUT } from '@/lib/tokens'
+import { COLOR, FONT, LAYOUT, SIZE } from '@/lib/tokens'
 import type { TodayAttendance, SiteConfig } from '@/lib/types'
 
 export function CastSection({
@@ -23,40 +23,49 @@ export function CastSection({
 
   return (
     <section className="px-3 py-4 sm:py-6">
-      <div className={`mx-auto w-full ${LAYOUT.pageMaxW}`}>
+      <div className={`mx-auto w-full ${LAYOUT.castListMaxW}`}>
         <SectionHeading>TODAY · CAST</SectionHeading>
-        <ul className={LAYOUT.castGrid}>
-          {todayCasts.map(cast => (
+        <ul className="flex flex-col" style={{ borderColor: COLOR.border }}>
+          {todayCasts.map((cast, idx) => (
             <li
               key={cast.slug}
-              className="overflow-hidden border bg-white"
-              style={{ borderColor: COLOR.border }}
+              className="flex items-stretch gap-2 sm:gap-3"
+              style={{
+                borderTop: `1px solid ${COLOR.border}`,
+                borderBottom: idx === todayCasts.length - 1 ? `1px solid ${COLOR.border}` : 'none',
+              }}
             >
-              <div className="relative aspect-[3/4] w-full bg-white">
+              <div
+                className="relative shrink-0 bg-white"
+                style={{
+                  width: SIZE.castPhoto,
+                  height: SIZE.castPhoto,
+                  borderRight: `1px solid ${COLOR.border}`,
+                }}
+              >
                 <Image
                   src={cast.photo_url || '/logo.jpg'}
                   alt={cast.display_name}
                   fill
-                  sizes="(max-width:640px) 50vw, (max-width:768px) 33vw, (max-width:1024px) 25vw, 20vw"
-                  className={cast.photo_url ? 'object-cover' : 'object-contain p-3'}
+                  sizes={`${SIZE.castPhoto}px`}
+                  className={cast.photo_url ? 'object-cover' : 'object-contain p-2'}
                   unoptimized={!cast.photo_url}
                 />
               </div>
-              <div className="border-t px-2 py-1.5 text-center sm:py-2"
-                   style={{ borderColor: COLOR.border }}>
-                <div className={`${FONT.base} font-bold sm:${FONT.md}`}>
-                  {cast.display_name}
+              <div className="flex flex-1 flex-col justify-center py-1.5 pr-2">
+                <div className={`${FONT.base} sm:${FONT.md}`}>
+                  <b>{cast.display_name}</b>
                   {cast.display_age != null && (
                     <span className={`ml-1 ${FONT.sm} font-normal`}>({cast.display_age})</span>
                   )}
                 </div>
                 {cast.clock_in && (
-                  <div className={`mt-0.5 ${FONT.xs} sm:${FONT.sm}`} style={{ color: COLOR.muted }}>
+                  <div className={`${FONT.sm}`} style={{ color: COLOR.muted }}>
                     出勤 {cast.clock_in}〜
                   </div>
                 )}
                 {(showDrink || showShot) && (
-                  <div className={`mt-1 flex flex-wrap justify-center gap-x-2 ${FONT.xs}`}>
+                  <div className={`flex flex-wrap gap-x-2 ${FONT.sm}`}>
                     {showDrink && <span>ドリンク：{cast.drink_count}</span>}
                     {showShot && <span>ショット：{cast.shot_count}</span>}
                     {cast.bottle_count > 0 && <span>ボトル：{cast.bottle_count}</span>}

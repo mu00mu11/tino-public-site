@@ -50,7 +50,14 @@ export const BREAK = {
 export const LAYOUT = {
   pageMaxW: 'max-w-[1100px]',
   contentMaxW: 'max-w-[600px]',
-  castGrid: 'grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 md:grid-cols-4 lg:grid-cols-5',
+  castListMaxW: 'max-w-[480px]',          // 縦1列・実物互換
   calendarMaxW: 'max-w-[600px]',
   floorMapMaxW: 'max-w-[600px]',
+} as const
+
+/** サイズ定数（実物互換） */
+export const SIZE = {
+  castPhoto: 100,                          // 実物 100x100 と一致
+  seatIcon: { w: 25, h: 50 },              // 実物 25x50 と一致
+  resultIcon: 30,                          // 実物 30x30 と一致
 } as const
