@@ -55,9 +55,9 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON cast_personal_info TO authenticated;
 3. [ ] 公開ビューに新列を追加する場合、`security-reviewer` エージェント呼んで監査
 4. [ ] 既存ビューに新列追加するときは `SELECT *` で取らない（列を必ず明示）
 
-## Sho が Supabase Dashboard で1度だけ実行すべき設定
+## ALTER DEFAULT PRIVILEGES 適用済 (2026-05-07)
 
-ALTER DEFAULT PRIVILEGES は MCP/migration から実行不可（superuser権限要）。**Supabase Dashboard → SQL Editor から1度だけ実行** :
+**`postgres` role 自身のデフォルト権限**は MCP からも変更可能だった (前は `FOR ROLE postgres/supabase_admin` を含めていたため失敗していた)。
 
 ```sql
 ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE ALL ON TABLES FROM anon;
@@ -65,14 +65,9 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE ALL ON SEQUENCES FROM anon;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE ALL ON FUNCTIONS FROM anon;
 ```
 
-これを1度実行すれば、**今後新規テーブル/関数/シーケンスを作っても anon に自動 GRANT されない** = 上記ケースBの「忘れて漏洩」事故を物理的に防げる。
+migration履歴: `pos-app/supabase/migrations/20260508_block_anon_default_grants.sql`
 
-実行後の検証:
-```sql
-CREATE TABLE _verify_default_acl_block (id int, secret text);
-SET LOCAL ROLE anon; SELECT * FROM _verify_default_acl_block;  -- permission denied
-DROP TABLE _verify_default_acl_block;
-```
+実証済み: 新テーブル `_verify_default_acl_block` に「山田太郎・豊島区南大塚3-53-3・090-9999-9999」を入れたが anon で **permission denied** だった (テーブル削除済)。
 
 ## 公開ビュー編集の禁則
 
