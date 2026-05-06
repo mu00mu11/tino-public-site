@@ -46,13 +46,13 @@ export const BREAK = {
   xl: 1280,
 } as const
 
-/** 出勤情報など、ぱっと見の情報密度コントロール */
+/** 出勤情報など、ぱっと見の情報密度コントロール（実物互換・自然幅で中央寄せ） */
 export const LAYOUT = {
   pageMaxW: 'max-w-[1100px]',
   contentMaxW: 'max-w-[600px]',
-  castListMaxW: 'max-w-[480px]',          // 縦1列・実物互換
-  calendarMaxW: 'max-w-[600px]',
-  floorMapMaxW: 'max-w-[600px]',
+  castListMaxW: 'max-w-[360px]',          // 実物 table自然幅相当
+  calendarMaxW: 'max-w-[400px]',          // 実物カレンダー幅相当
+  floorMapMaxW: 'max-w-[400px]',          // 椅子↔猫10席は実物25×50で約280px
 } as const
 
 /** サイズ定数（実物互換） */
