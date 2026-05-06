@@ -1,10 +1,11 @@
 import Image from 'next/image'
 import { pickResultLevel, type ResultLevel } from '@/lib/thresholds'
+import { COLOR, LAYOUT } from '@/lib/tokens'
 import type { DailyStats, SiteConfig } from '@/lib/types'
 
 const WEEKDAY_LABELS = ['日', '月', '火', '水', '木', '金', '土']
 
-function buildMonthGrid(year: number, month0: number): Array<{ date: number; isCurrentMonth: boolean; iso: string; weekday: number }> {
+function buildMonthGrid(year: number, month0: number) {
   const first = new Date(year, month0, 1)
   const last = new Date(year, month0 + 1, 0)
   const startWeekday = first.getDay()
@@ -28,7 +29,7 @@ function buildMonthGrid(year: number, month0: number): Array<{ date: number; isC
   return cells
 }
 
-export function ProfitCalendar({
+export function CalendarSection({
   stats,
   thresholds,
 }: {
@@ -42,25 +43,23 @@ export function ProfitCalendar({
   const statsMap = new Map(stats.map(s => [s.business_date, s]))
   const monthLabel = `${year}年${month0 + 1}月`
   const todayIso = `${year}-${String(month0 + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
-
   const monthPrefix = `${year}-${String(month0 + 1).padStart(2, '0')}`
-  const maxGuest = Math.max(0, ...stats
-    .filter(s => s.business_date.startsWith(monthPrefix))
-    .map(s => s.guest_count))
+  const maxGuest = Math.max(0, ...stats.filter(s => s.business_date.startsWith(monthPrefix)).map(s => s.guest_count))
 
   return (
     <section className="px-3 py-5 sm:py-8">
-      <div className="mx-auto w-full max-w-[600px]">
-        <div className="mb-2 text-center text-sm tracking-wider sm:text-base">
-          {monthLabel}
-        </div>
-        <div className="grid grid-cols-7 border border-black">
+      <div className={`mx-auto w-full ${LAYOUT.calendarMaxW}`}>
+        <div className="mb-2 text-center text-sm tracking-wider sm:text-base">{monthLabel}</div>
+        <div className="grid grid-cols-7 border" style={{ borderColor: COLOR.border }}>
           {WEEKDAY_LABELS.map((w, i) => (
             <div
               key={`h-${i}`}
-              className={`border-b border-black bg-white py-1 text-center text-[10px] sm:text-xs ${
-                i === 0 ? 'text-[#c8102e]' : i === 6 ? 'text-[#1b2244]' : 'text-black'
-              } ${i < 6 ? 'border-r border-black' : ''}`}
+              className={`bg-white py-1 text-center text-[10px] sm:text-xs ${i < 6 ? 'border-r' : ''}`}
+              style={{
+                borderColor: COLOR.border,
+                borderBottom: `1px solid ${COLOR.border}`,
+                color: i === 0 ? COLOR.danger : i === 6 ? COLOR.accent : COLOR.fg,
+              }}
             >
               {w}
             </div>
@@ -68,13 +67,14 @@ export function ProfitCalendar({
           {cells.map((cell, i) => {
             const isLastCol = (i + 1) % 7 === 0
             const isLastRow = i >= cells.length - 7
-            const borders = `${!isLastCol ? 'border-r border-black' : ''} ${!isLastRow ? 'border-b border-black' : ''}`
+            const borderRight = !isLastCol ? `1px solid ${COLOR.border}` : 'none'
+            const borderBottom = !isLastRow ? `1px solid ${COLOR.border}` : 'none'
             if (!cell.isCurrentMonth) {
               return (
                 <div
                   key={`b-${i}`}
-                  className={`aspect-square ${borders}`}
-                  style={{ background: 'rgb(220,220,220)' }}
+                  className="aspect-square"
+                  style={{ background: COLOR.noBusiness, borderRight, borderBottom }}
                 />
               )
             }
@@ -86,23 +86,18 @@ export function ProfitCalendar({
             const isFuture = cell.iso > todayIso
             const cellClass = isBest ? 'rank-best' : isFriday ? 'rank-friday' : ''
             const dateColor = isBest || isFriday
-              ? 'text-white'
-              : cell.weekday === 0
-                ? 'text-[#c8102e]'
-                : cell.weekday === 6
-                  ? 'text-[#1b2244]'
-                  : 'text-black'
+              ? '#fff'
+              : cell.weekday === 0 ? COLOR.danger
+              : cell.weekday === 6 ? COLOR.accent
+              : COLOR.fg
+            const cellBg = !hasData && !isFuture && !isFriday && !isBest ? COLOR.noBusiness : undefined
             return (
               <div
                 key={`d-${i}`}
-                className={`relative aspect-square overflow-hidden ${cellClass} ${borders}`}
-                style={
-                  !hasData && !isFuture && !isFriday && !isBest
-                    ? { background: 'rgb(220,220,220)' }
-                    : undefined
-                }
+                className={`relative aspect-square overflow-hidden ${cellClass}`}
+                style={{ background: cellBg, borderRight, borderBottom }}
               >
-                <div className={`absolute left-1 top-0.5 text-[9px] sm:text-[10px] ${dateColor}`}>
+                <div className="absolute left-1 top-0.5 text-[9px] sm:text-[10px]" style={{ color: dateColor }}>
                   {cell.date}
                 </div>
                 {hasData && !isFuture ? (
@@ -117,9 +112,10 @@ export function ProfitCalendar({
                         unoptimized
                       />
                     </div>
-                    <span className={`text-[9px] leading-none sm:text-[10px] ${
-                      isBest || isFriday ? 'text-white' : 'text-black'
-                    }`}>
+                    <span
+                      className="text-[9px] leading-none sm:text-[10px]"
+                      style={{ color: isBest || isFriday ? '#fff' : COLOR.fg }}
+                    >
                       {stat.guest_count}人
                     </span>
                   </div>

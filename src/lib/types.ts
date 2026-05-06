@@ -1,3 +1,10 @@
+/**
+ * types.ts — Supabase公開ビューと1:1の型定義
+ *
+ * ビューの列を増やしたら、ここに追加する。
+ * 詳しくは docs/ADDING_FIELDS.md を参照。
+ */
+
 export type PublicCast = {
   cast_id: string
   slug: string
@@ -29,6 +36,9 @@ export type TodayAttendance = {
   photo_url: string | null
   clock_in: string | null
   is_active: boolean
+  drink_count: number
+  shot_count: number
+  bottle_count: number
 }
 
 export type DailyStats = {
@@ -39,12 +49,7 @@ export type DailyStats = {
 export type SiteConfig = {
   is_published: boolean
   calendar_thresholds: {
-    r0: number
-    r1: number
-    r2: number
-    r3: number
-    r4: number
-    r5: number
+    r0: number; r1: number; r2: number; r3: number; r4: number; r5: number
   }
   show_drink_count: boolean
   show_shot_count: boolean

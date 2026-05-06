@@ -1,50 +1,47 @@
-import { supabase } from '@/lib/supabase'
-import { Hero } from '@/components/Hero'
-import { FloorMap } from '@/components/FloorMap'
-import { CastGrid } from '@/components/CastGrid'
-import { ProfitCalendar } from '@/components/ProfitCalendar'
-import { StoreInfo } from '@/components/StoreInfo'
-import { Footer } from '@/components/Footer'
-import { DEFAULT_THRESHOLDS } from '@/lib/thresholds'
-import type { FloorSeat, TodayAttendance, DailyStats, SiteConfig } from '@/lib/types'
+import { HeroSection } from '@/components/sections/HeroSection'
+import { FloorMapSection } from '@/components/sections/FloorMapSection'
+import { CastSection } from '@/components/sections/CastSection'
+import { CalendarSection } from '@/components/sections/CalendarSection'
+import { AccessSection } from '@/components/sections/AccessSection'
+import { FooterSection } from '@/components/sections/FooterSection'
+import { fetchFloorStatus } from '@/lib/queries/floor'
+import { fetchTodayAttendance } from '@/lib/queries/casts'
+import { fetchDailyStats } from '@/lib/queries/stats'
+import { fetchSiteConfig } from '@/lib/queries/config'
+import { COLOR } from '@/lib/tokens'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 export default async function Page() {
-  const [seatsRes, todayRes, statsRes, configRes] = await Promise.all([
-    supabase.from('public_floor_status_view').select('*').order('sort_order', { ascending: true }),
-    supabase.from('public_today_attendance_view').select('*'),
-    supabase.from('public_daily_stats_view').select('*').order('business_date', { ascending: true }),
-    supabase.from('public_site_config_view').select('*').limit(1).maybeSingle(),
+  const [seats, today, stats, config] = await Promise.all([
+    fetchFloorStatus(),
+    fetchTodayAttendance(),
+    fetchDailyStats(),
+    fetchSiteConfig(),
   ])
 
-  const seats = (seatsRes.data ?? []) as FloorSeat[]
-  const today = (todayRes.data ?? []) as TodayAttendance[]
-  const stats = (statsRes.data ?? []) as DailyStats[]
-  const config = (configRes.data ?? null) as SiteConfig | null
-
-  if (config && !config.is_published) {
+  if (!config.is_published) {
     return (
       <main className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center px-6">
           <h1 className="text-xl font-medium mb-2">準備中</h1>
-          <p className="text-sm text-[#6b7280]">ただいま公開準備中です</p>
+          <p className="text-sm" style={{ color: COLOR.muted }}>
+            ただいま公開準備中です
+          </p>
         </div>
       </main>
     )
   }
 
-  const thresholds = config?.calendar_thresholds ?? DEFAULT_THRESHOLDS
-
   return (
-    <main className="min-h-screen bg-white">
-      <Hero />
-      <FloorMap initialSeats={seats} />
-      <CastGrid todayCasts={today} />
-      <ProfitCalendar stats={stats} thresholds={thresholds} />
-      <StoreInfo />
-      <Footer />
+    <main className="min-h-screen" style={{ background: COLOR.bg }}>
+      <HeroSection />
+      <FloorMapSection initialSeats={seats} />
+      <CastSection todayCasts={today} config={config} />
+      <CalendarSection stats={stats} thresholds={config.calendar_thresholds} />
+      <AccessSection />
+      <FooterSection />
     </main>
   )
 }

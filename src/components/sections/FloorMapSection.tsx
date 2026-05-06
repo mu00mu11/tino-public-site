@@ -2,43 +2,39 @@
 
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { supabase } from '@/lib/supabase'
+import { fetchFloorStatus } from '@/lib/queries/floor'
+import { LAYOUT } from '@/lib/tokens'
 import type { FloorSeat } from '@/lib/types'
 
 const POLL_MS = 5000
 
-export function FloorMap({ initialSeats }: { initialSeats: FloorSeat[] }) {
+const FALLBACK: FloorSeat[] = Array.from({ length: 10 }, (_, i) => ({
+  seat_id: `placeholder-${i}`,
+  label: '',
+  x: 0, y: 0,
+  type: 'table',
+  capacity: 2,
+  sort_order: i,
+  is_occupied: false,
+}))
+
+export function FloorMapSection({ initialSeats }: { initialSeats: FloorSeat[] }) {
   const [seats, setSeats] = useState<FloorSeat[]>(initialSeats)
 
   useEffect(() => {
     let cancelled = false
-    async function tick() {
-      const { data } = await supabase
-        .from('public_floor_status_view')
-        .select('*')
-        .order('sort_order', { ascending: true })
-      if (cancelled) return
-      if (data) setSeats(data as FloorSeat[])
-    }
-    const id = setInterval(tick, POLL_MS)
+    const id = setInterval(async () => {
+      const next = await fetchFloorStatus()
+      if (!cancelled && next.length > 0) setSeats(next)
+    }, POLL_MS)
     return () => { cancelled = true; clearInterval(id) }
   }, [])
 
-  const display = seats.length > 0
-    ? seats
-    : Array.from({ length: 10 }, (_, i) => ({
-        seat_id: `placeholder-${i}`,
-        label: '',
-        x: 0, y: 0,
-        type: 'table' as const,
-        capacity: 2,
-        sort_order: i,
-        is_occupied: false,
-      }))
+  const display = seats.length > 0 ? seats : FALLBACK
 
   return (
     <section className="px-3 py-3 sm:py-5">
-      <div className="mx-auto flex w-full max-w-[600px] flex-row flex-nowrap items-end justify-between gap-[1%]">
+      <div className={`mx-auto flex w-full ${LAYOUT.floorMapMaxW} flex-row flex-nowrap items-end justify-between gap-[1%]`}>
         {display.map(seat => (
           <div
             key={seat.seat_id}
