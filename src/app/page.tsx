@@ -39,7 +39,7 @@ export default async function Page() {
       <HeroSection />
       <FloorMapSection initialSeats={seats} />
       <CastSection todayCasts={today} config={config} />
-      <CalendarSection stats={stats} thresholds={config.calendar_thresholds} />
+      <CalendarSection stats={stats} />
       <AccessSection />
       <FooterSection />
     </main>

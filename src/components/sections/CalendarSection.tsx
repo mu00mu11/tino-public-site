@@ -1,7 +1,6 @@
 import Image from 'next/image'
-import { pickResultLevel, type ResultLevel } from '@/lib/thresholds'
 import { COLOR, LAYOUT } from '@/lib/tokens'
-import type { DailyStats, SiteConfig } from '@/lib/types'
+import type { DailyStats } from '@/lib/types'
 
 const WEEKDAY_LABELS = ['日', '月', '火', '水', '木', '金', '土']
 
@@ -29,13 +28,13 @@ function buildMonthGrid(year: number, month0: number) {
   return cells
 }
 
-export function CalendarSection({
-  stats,
-  thresholds,
-}: {
-  stats: DailyStats[]
-  thresholds: SiteConfig['calendar_thresholds']
-}) {
+function bgClass(bg: DailyStats['bg']): string {
+  if (bg === 'rainbow') return 'rank-rainbow'
+  if (bg === 'gold') return 'rank-gold'
+  return ''
+}
+
+export function CalendarSection({ stats }: { stats: DailyStats[] }) {
   const today = new Date()
   const year = today.getFullYear()
   const month0 = today.getMonth()
@@ -43,8 +42,6 @@ export function CalendarSection({
   const statsMap = new Map(stats.map(s => [s.business_date, s]))
   const monthLabel = `${year}年${month0 + 1}月`
   const todayIso = `${year}-${String(month0 + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
-  const monthPrefix = `${year}-${String(month0 + 1).padStart(2, '0')}`
-  const maxGuest = Math.max(0, ...stats.filter(s => s.business_date.startsWith(monthPrefix)).map(s => s.guest_count))
 
   return (
     <section className="px-3 py-5 sm:py-8">
@@ -54,9 +51,9 @@ export function CalendarSection({
           {WEEKDAY_LABELS.map((w, i) => (
             <div
               key={`h-${i}`}
-              className={`bg-white py-1 text-center text-[10px] sm:text-xs ${i < 6 ? 'border-r' : ''}`}
+              className="bg-white py-1 text-center text-[10px] sm:text-xs"
               style={{
-                borderColor: COLOR.border,
+                borderRight: i < 6 ? `1px solid ${COLOR.border}` : 'none',
                 borderBottom: `1px solid ${COLOR.border}`,
                 color: i === 0 ? COLOR.danger : i === 6 ? COLOR.accent : COLOR.fg,
               }}
@@ -79,18 +76,16 @@ export function CalendarSection({
               )
             }
             const stat = statsMap.get(cell.iso)
-            const hasData = !!stat
-            const level: ResultLevel = stat ? pickResultLevel(stat.guest_count, thresholds) : 0
-            const isFriday = cell.weekday === 5
-            const isBest = hasData && stat.guest_count > 0 && stat.guest_count === maxGuest
             const isFuture = cell.iso > todayIso
-            const cellClass = isBest ? 'rank-best' : isFriday ? 'rank-friday' : ''
-            const dateColor = isBest || isFriday
+            const hasData = !!stat && stat.level > 0
+            const cellClass = stat ? bgClass(stat.bg) : ''
+            const isHighlight = !!stat?.bg
+            const dateColor = isHighlight
               ? '#fff'
               : cell.weekday === 0 ? COLOR.danger
               : cell.weekday === 6 ? COLOR.accent
               : COLOR.fg
-            const cellBg = !hasData && !isFuture && !isFriday && !isBest ? COLOR.noBusiness : undefined
+            const cellBg = !hasData && !isFuture && !isHighlight ? COLOR.noBusiness : undefined
             return (
               <div
                 key={`d-${i}`}
@@ -104,8 +99,8 @@ export function CalendarSection({
                   <div className="flex h-full flex-col items-center justify-center pt-2">
                     <div className="relative aspect-square w-[55%] max-w-[30px]">
                       <Image
-                        src={`/result/result${level}.png`}
-                        alt={`level ${level}`}
+                        src={`/result/result${stat.level}.png`}
+                        alt={`level ${stat.level}`}
                         fill
                         sizes="30px"
                         className="object-contain"
@@ -114,7 +109,7 @@ export function CalendarSection({
                     </div>
                     <span
                       className="text-[9px] leading-none sm:text-[10px]"
-                      style={{ color: isBest || isFriday ? '#fff' : COLOR.fg }}
+                      style={{ color: isHighlight ? '#fff' : COLOR.fg }}
                     >
                       {stat.guest_count}人
                     </span>

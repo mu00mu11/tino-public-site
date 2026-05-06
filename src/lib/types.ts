@@ -44,6 +44,10 @@ export type TodayAttendance = {
 export type DailyStats = {
   business_date: string
   guest_count: number
+  /** 0=営業外/2=水色/3=普通/4=黄色ニコ/5=ピンクニコニコ */
+  level: 0 | 2 | 3 | 4 | 5
+  /** 5の特別背景。'rainbow'=虹色(売上最高)・'gold'=金色(高売上)・null=通常 */
+  bg: 'rainbow' | 'gold' | null
 }
 
 export type SiteConfig = {

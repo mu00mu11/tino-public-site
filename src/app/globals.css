@@ -34,12 +34,14 @@ body {
   letter-spacing: 0.02em;
 }
 
-/* Calendar 6-stage rank gradients (preserved from original) */
-.rank-friday {
+/* Calendar bg classes (実物の rank6/rank7 グラデを 売上ベースに転用) */
+.rank-gold {
+  /* ¥300,000以上の高売上日（result5 + 金色グラデ） */
   background: linear-gradient(45deg, #b67b03 0%, #daaf08 45%, #fee9a0 70%, #daaf08 85%, #b67b03 100%);
   color: #fff;
 }
-.rank-best {
+.rank-rainbow {
+  /* ¥400,000以上の最高売上日（result5 + 虹色グラデ） */
   background-image: linear-gradient(180deg,
     rgba(255, 97, 97, 1),
     rgba(233, 178, 45, 1) 20%,
