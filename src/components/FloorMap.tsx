@@ -9,7 +9,6 @@ const POLL_MS = 5000
 
 export function FloorMap({ initialSeats }: { initialSeats: FloorSeat[] }) {
   const [seats, setSeats] = useState<FloorSeat[]>(initialSeats)
-  const [updatedAt, setUpdatedAt] = useState<Date>(new Date())
 
   useEffect(() => {
     let cancelled = false
@@ -19,10 +18,7 @@ export function FloorMap({ initialSeats }: { initialSeats: FloorSeat[] }) {
         .select('*')
         .order('sort_order', { ascending: true })
       if (cancelled) return
-      if (data) {
-        setSeats(data as FloorSeat[])
-        setUpdatedAt(new Date())
-      }
+      if (data) setSeats(data as FloorSeat[])
     }
     const id = setInterval(tick, POLL_MS)
     return () => { cancelled = true; clearInterval(id) }
@@ -33,7 +29,7 @@ export function FloorMap({ initialSeats }: { initialSeats: FloorSeat[] }) {
     ? seats
     : Array.from({ length: 10 }, (_, i) => ({
         seat_id: `placeholder-${i}`,
-        label: `席${i + 1}`,
+        label: '',
         x: 0, y: 0,
         type: 'table' as const,
         capacity: 2,
@@ -41,44 +37,25 @@ export function FloorMap({ initialSeats }: { initialSeats: FloorSeat[] }) {
         is_occupied: false,
       }))
 
-  const occupied = display.filter(s => s.is_occupied).length
-
   return (
-    <section className="px-4 py-6">
-      <div className="mx-auto max-w-3xl">
-        <div className="flex items-baseline justify-between mb-3">
-          <h2 className="text-sm font-medium tracking-[0.2em] text-[#0a0a0a]">
-            STATUS
-          </h2>
-          <span className="text-xs text-[#6b7280]">
-            {occupied} / {display.length} 席稼働中
-          </span>
-        </div>
-        <div className="grid grid-cols-5 gap-2 sm:gap-3">
-          {display.map(seat => (
-            <div
-              key={seat.seat_id}
-              className="flex flex-col items-center"
-              aria-label={`${seat.label} ${seat.is_occupied ? '使用中' : '空席'}`}
-            >
-              <div className="relative aspect-[1/2] w-full max-w-[60px] overflow-hidden">
-                <Image
-                  src={seat.is_occupied ? '/seat/cat.jpg' : '/seat/chair.jpg'}
-                  alt={seat.is_occupied ? '使用中' : '空席'}
-                  fill
-                  sizes="(max-width: 640px) 60px, 80px"
-                  className="object-contain"
-                />
-              </div>
-              <span className="mt-1 text-[10px] text-[#6b7280]">
-                {seat.label}
-              </span>
-            </div>
-          ))}
-        </div>
-        <p className="mt-3 text-center text-[10px] text-[#9ca3af]">
-          自動更新 · 最終 {updatedAt.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-        </p>
+    <section className="px-3 py-4 flex justify-center">
+      <div className="flex flex-row flex-nowrap items-end justify-center gap-1">
+        {display.map(seat => (
+          <div
+            key={seat.seat_id}
+            className="shrink-0"
+            aria-label={seat.is_occupied ? '使用中' : '空席'}
+          >
+            <Image
+              src={seat.is_occupied ? '/seat/cat.png' : '/seat/chair.png'}
+              alt={seat.is_occupied ? '使用中' : '空席'}
+              width={25}
+              height={50}
+              className="block"
+              unoptimized
+            />
+          </div>
+        ))}
       </div>
     </section>
   )

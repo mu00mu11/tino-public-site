@@ -1,23 +1,6 @@
+import Image from 'next/image'
 import { pickResultLevel, type ResultLevel } from '@/lib/thresholds'
 import type { DailyStats, SiteConfig } from '@/lib/types'
-
-const RESULT_EMOJI: Record<ResultLevel, string> = {
-  0: '😞',
-  1: '😐',
-  2: '🙂',
-  3: '😊',
-  4: '😄',
-  5: '😍',
-}
-
-const RESULT_LABEL: Record<ResultLevel, string> = {
-  0: '少',
-  1: 'やや少',
-  2: '普通',
-  3: '好調',
-  4: '繁盛',
-  5: '満員',
-}
 
 const WEEKDAY_LABELS = ['日', '月', '火', '水', '木', '金', '土']
 
@@ -58,76 +41,88 @@ export function ProfitCalendar({
   const cells = buildMonthGrid(year, month0)
   const statsMap = new Map(stats.map(s => [s.business_date, s]))
   const monthLabel = `${year}年${month0 + 1}月`
+  const todayIso = `${year}-${String(month0 + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
 
-  // Find max guest count for current month (for "best day" highlight)
+  // 月最高客数（rank-best 虹色用）
+  const monthPrefix = `${year}-${String(month0 + 1).padStart(2, '0')}`
   const maxGuest = Math.max(0, ...stats
-    .filter(s => s.business_date.startsWith(`${year}-${String(month0 + 1).padStart(2, '0')}`))
+    .filter(s => s.business_date.startsWith(monthPrefix))
     .map(s => s.guest_count))
 
   return (
-    <section className="px-4 py-8">
-      <div className="mx-auto max-w-3xl">
-        <div className="flex items-baseline justify-between mb-3">
-          <h2 className="text-sm font-medium tracking-[0.2em]">CALENDAR</h2>
-          <span className="text-xs text-[#6b7280]">{monthLabel}</span>
-        </div>
-        <div className="grid grid-cols-7 gap-px bg-[#e5e7eb] rounded-md overflow-hidden border border-[#e5e7eb]">
-          {WEEKDAY_LABELS.map((w, i) => (
-            <div
-              key={`h-${i}`}
-              className={`bg-white text-center text-[10px] py-1 ${
-                i === 0 ? 'text-[#c8102e]' : i === 6 ? 'text-[#1b2244]' : 'text-[#6b7280]'
-              }`}
-            >
-              {w}
-            </div>
-          ))}
-          {cells.map((cell, i) => {
-            if (!cell.isCurrentMonth) {
-              return <div key={`b-${i}`} className="bg-[#fafafa] aspect-square" />
-            }
-            const stat = statsMap.get(cell.iso)
-            const hasData = !!stat
-            const level = stat ? pickResultLevel(stat.guest_count, thresholds) : 0
-            const isFriday = cell.weekday === 5
-            const isBest = hasData && stat.guest_count > 0 && stat.guest_count === maxGuest
-            const isFuture = cell.iso > new Date().toISOString().slice(0, 10)
-            return (
-              <div
-                key={`d-${i}`}
-                className={`relative aspect-square bg-white flex flex-col items-center justify-center ${
-                  isBest ? 'rank-best' : isFriday ? 'rank-friday' : ''
-                }`}
-                title={hasData ? `${cell.iso} · ${stat.guest_count}人 · ${RESULT_LABEL[level]}` : cell.iso}
+    <section className="px-3 py-4">
+      <div className="text-center mb-2 text-sm">{monthLabel}</div>
+      <table className="mx-auto border-collapse">
+        <thead>
+          <tr>
+            {WEEKDAY_LABELS.map((w, i) => (
+              <th
+                key={`h-${i}`}
+                className="border border-black px-2 py-1 text-xs"
               >
-                <span className={`absolute top-1 left-1 text-[9px] ${
-                  isBest || isFriday ? 'text-white' : cell.weekday === 0 ? 'text-[#c8102e]' : 'text-[#0a0a0a]'
-                }`}>
-                  {cell.date}
-                </span>
-                {hasData ? (
-                  <div className="flex flex-col items-center justify-center">
-                    <span className="text-base sm:text-lg" aria-hidden>
-                      {RESULT_EMOJI[level]}
-                    </span>
-                    <span className={`text-[9px] sm:text-[10px] ${
-                      isBest || isFriday ? 'text-white' : 'text-[#6b7280]'
-                    }`}>
-                      {stat.guest_count}人
-                    </span>
-                  </div>
-                ) : (
-                  <span className={`text-[10px] ${
-                    isFuture ? 'text-[#d1d5db]' : 'text-[#9ca3af]'
-                  }`}>
-                    {isFuture ? '' : '休'}
-                  </span>
-                )}
-              </div>
+                {w}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {Array.from({ length: cells.length / 7 }, (_, weekIdx) => {
+            const week = cells.slice(weekIdx * 7, weekIdx * 7 + 7)
+            return (
+              <tr key={`w-${weekIdx}`}>
+                {week.map((cell, i) => {
+                  if (!cell.isCurrentMonth) {
+                    return (
+                      <td
+                        key={`b-${weekIdx}-${i}`}
+                        className="border border-black w-12 h-14"
+                        style={{ background: 'rgb(220,220,220)' }}
+                      />
+                    )
+                  }
+                  const stat = statsMap.get(cell.iso)
+                  const hasData = !!stat
+                  const level: ResultLevel = stat ? pickResultLevel(stat.guest_count, thresholds) : 0
+                  const isFriday = cell.weekday === 5
+                  const isBest = hasData && stat.guest_count > 0 && stat.guest_count === maxGuest
+                  const isFuture = cell.iso > todayIso
+                  const cellClass = isBest ? 'rank-best' : isFriday ? 'rank-friday' : ''
+                  return (
+                    <td
+                      key={`d-${weekIdx}-${i}`}
+                      className={`border border-black w-12 h-14 text-center align-top ${cellClass}`}
+                      style={
+                        !hasData && !isFuture && !isFriday && !isBest
+                          ? { background: 'rgb(220,220,220)' }
+                          : undefined
+                      }
+                    >
+                      <div className="text-[10px] leading-tight pt-1">
+                        {cell.date}
+                      </div>
+                      {hasData && !isFuture ? (
+                        <div className="flex flex-col items-center justify-center mt-0.5">
+                          <Image
+                            src={`/result/result${level}.png`}
+                            alt={`level ${level}`}
+                            width={30}
+                            height={30}
+                            className="block"
+                            unoptimized
+                          />
+                          <span className="text-[10px] leading-none mt-0.5">
+                            {stat.guest_count}人
+                          </span>
+                        </div>
+                      ) : null}
+                    </td>
+                  )
+                })}
+              </tr>
             )
           })}
-        </div>
-      </div>
+        </tbody>
+      </table>
     </section>
   )
 }
