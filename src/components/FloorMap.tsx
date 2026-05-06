@@ -24,7 +24,6 @@ export function FloorMap({ initialSeats }: { initialSeats: FloorSeat[] }) {
     return () => { cancelled = true; clearInterval(id) }
   }, [])
 
-  // 実物互換：座席が0件なら10席のデフォルトプレースホルダ
   const display = seats.length > 0
     ? seats
     : Array.from({ length: 10 }, (_, i) => ({
@@ -38,20 +37,20 @@ export function FloorMap({ initialSeats }: { initialSeats: FloorSeat[] }) {
       }))
 
   return (
-    <section className="px-3 py-4 flex justify-center">
-      <div className="flex flex-row flex-nowrap items-end justify-center gap-1">
+    <section className="px-3 py-3 sm:py-5">
+      <div className="mx-auto flex w-full max-w-[600px] flex-row flex-nowrap items-end justify-between gap-[1%]">
         {display.map(seat => (
           <div
             key={seat.seat_id}
-            className="shrink-0"
+            className="relative aspect-[1/2] basis-[8%] grow-0 shrink-0"
             aria-label={seat.is_occupied ? '使用中' : '空席'}
           >
             <Image
               src={seat.is_occupied ? '/seat/cat.png' : '/seat/chair.png'}
               alt={seat.is_occupied ? '使用中' : '空席'}
-              width={25}
-              height={50}
-              className="block"
+              fill
+              sizes="(max-width:600px) 8vw, 48px"
+              className="object-contain"
               unoptimized
             />
           </div>

@@ -43,86 +43,92 @@ export function ProfitCalendar({
   const monthLabel = `${year}年${month0 + 1}月`
   const todayIso = `${year}-${String(month0 + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
 
-  // 月最高客数（rank-best 虹色用）
   const monthPrefix = `${year}-${String(month0 + 1).padStart(2, '0')}`
   const maxGuest = Math.max(0, ...stats
     .filter(s => s.business_date.startsWith(monthPrefix))
     .map(s => s.guest_count))
 
   return (
-    <section className="px-3 py-4">
-      <div className="text-center mb-2 text-sm">{monthLabel}</div>
-      <table className="mx-auto border-collapse">
-        <thead>
-          <tr>
-            {WEEKDAY_LABELS.map((w, i) => (
-              <th
-                key={`h-${i}`}
-                className="border border-black px-2 py-1 text-xs"
-              >
-                {w}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {Array.from({ length: cells.length / 7 }, (_, weekIdx) => {
-            const week = cells.slice(weekIdx * 7, weekIdx * 7 + 7)
+    <section className="px-3 py-5 sm:py-8">
+      <div className="mx-auto w-full max-w-[600px]">
+        <div className="mb-2 text-center text-sm tracking-wider sm:text-base">
+          {monthLabel}
+        </div>
+        <div className="grid grid-cols-7 border border-black">
+          {WEEKDAY_LABELS.map((w, i) => (
+            <div
+              key={`h-${i}`}
+              className={`border-b border-black bg-white py-1 text-center text-[10px] sm:text-xs ${
+                i === 0 ? 'text-[#c8102e]' : i === 6 ? 'text-[#1b2244]' : 'text-black'
+              } ${i < 6 ? 'border-r border-black' : ''}`}
+            >
+              {w}
+            </div>
+          ))}
+          {cells.map((cell, i) => {
+            const isLastCol = (i + 1) % 7 === 0
+            const isLastRow = i >= cells.length - 7
+            const borders = `${!isLastCol ? 'border-r border-black' : ''} ${!isLastRow ? 'border-b border-black' : ''}`
+            if (!cell.isCurrentMonth) {
+              return (
+                <div
+                  key={`b-${i}`}
+                  className={`aspect-square ${borders}`}
+                  style={{ background: 'rgb(220,220,220)' }}
+                />
+              )
+            }
+            const stat = statsMap.get(cell.iso)
+            const hasData = !!stat
+            const level: ResultLevel = stat ? pickResultLevel(stat.guest_count, thresholds) : 0
+            const isFriday = cell.weekday === 5
+            const isBest = hasData && stat.guest_count > 0 && stat.guest_count === maxGuest
+            const isFuture = cell.iso > todayIso
+            const cellClass = isBest ? 'rank-best' : isFriday ? 'rank-friday' : ''
+            const dateColor = isBest || isFriday
+              ? 'text-white'
+              : cell.weekday === 0
+                ? 'text-[#c8102e]'
+                : cell.weekday === 6
+                  ? 'text-[#1b2244]'
+                  : 'text-black'
             return (
-              <tr key={`w-${weekIdx}`}>
-                {week.map((cell, i) => {
-                  if (!cell.isCurrentMonth) {
-                    return (
-                      <td
-                        key={`b-${weekIdx}-${i}`}
-                        className="border border-black w-12 h-14"
-                        style={{ background: 'rgb(220,220,220)' }}
+              <div
+                key={`d-${i}`}
+                className={`relative aspect-square overflow-hidden ${cellClass} ${borders}`}
+                style={
+                  !hasData && !isFuture && !isFriday && !isBest
+                    ? { background: 'rgb(220,220,220)' }
+                    : undefined
+                }
+              >
+                <div className={`absolute left-1 top-0.5 text-[9px] sm:text-[10px] ${dateColor}`}>
+                  {cell.date}
+                </div>
+                {hasData && !isFuture ? (
+                  <div className="flex h-full flex-col items-center justify-center pt-2">
+                    <div className="relative aspect-square w-[55%] max-w-[30px]">
+                      <Image
+                        src={`/result/result${level}.png`}
+                        alt={`level ${level}`}
+                        fill
+                        sizes="30px"
+                        className="object-contain"
+                        unoptimized
                       />
-                    )
-                  }
-                  const stat = statsMap.get(cell.iso)
-                  const hasData = !!stat
-                  const level: ResultLevel = stat ? pickResultLevel(stat.guest_count, thresholds) : 0
-                  const isFriday = cell.weekday === 5
-                  const isBest = hasData && stat.guest_count > 0 && stat.guest_count === maxGuest
-                  const isFuture = cell.iso > todayIso
-                  const cellClass = isBest ? 'rank-best' : isFriday ? 'rank-friday' : ''
-                  return (
-                    <td
-                      key={`d-${weekIdx}-${i}`}
-                      className={`border border-black w-12 h-14 text-center align-top ${cellClass}`}
-                      style={
-                        !hasData && !isFuture && !isFriday && !isBest
-                          ? { background: 'rgb(220,220,220)' }
-                          : undefined
-                      }
-                    >
-                      <div className="text-[10px] leading-tight pt-1">
-                        {cell.date}
-                      </div>
-                      {hasData && !isFuture ? (
-                        <div className="flex flex-col items-center justify-center mt-0.5">
-                          <Image
-                            src={`/result/result${level}.png`}
-                            alt={`level ${level}`}
-                            width={30}
-                            height={30}
-                            className="block"
-                            unoptimized
-                          />
-                          <span className="text-[10px] leading-none mt-0.5">
-                            {stat.guest_count}人
-                          </span>
-                        </div>
-                      ) : null}
-                    </td>
-                  )
-                })}
-              </tr>
+                    </div>
+                    <span className={`text-[9px] leading-none sm:text-[10px] ${
+                      isBest || isFriday ? 'text-white' : 'text-black'
+                    }`}>
+                      {stat.guest_count}人
+                    </span>
+                  </div>
+                ) : null}
+              </div>
             )
           })}
-        </tbody>
-      </table>
+        </div>
+      </div>
     </section>
   )
 }
