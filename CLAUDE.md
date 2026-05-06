@@ -32,6 +32,14 @@ src/
 - ❌ セクション間で互いに import（独立を保つ）
 - ❌ ビューに `SELECT *` 使う（カラムを必ず明示列挙・機密漏洩防止）
 - ❌ `casts` / `bills` / `payments` 等POS本体テーブルに anon で直アクセス
+- ❌ 新テーブル追加 migration で `REVOKE ALL FROM anon, authenticated` を忘れる（=本名・住所が anon丸見え事故）
+
+## セキュリティ最重要
+
+POS本体と同じSupabaseを使う以上、機密漏洩リスクは常にある。**`docs/SECURITY.md` を必ず読む**。
+特に:
+- 新テーブル作成 migration には必ず `REVOKE ALL FROM anon` を含める
+- `ALTER DEFAULT PRIVILEGES` 設定 (Sho が Dashboard で1度実行) で物理的に塞ぐ
 
 ## やること
 
