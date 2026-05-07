@@ -13,7 +13,7 @@ export const STORE_INFO = {
     tel_link: 'tel:07085657142',
   },
   sns: {
-    instagram: null as string | null,
+    instagram: 'https://www.instagram.com/tino.otsuka/' as string | null,
     x: null as string | null,
     tiktok: null as string | null,
   },

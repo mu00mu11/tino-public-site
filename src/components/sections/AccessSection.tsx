@@ -1,9 +1,13 @@
+import Image from 'next/image'
 import { LinkButton } from '@/components/ui/LinkButton'
 import { SectionHeading } from '@/components/ui/SectionHeading'
 import { STORE_INFO } from '@/lib/info'
-import { COLOR, LAYOUT } from '@/lib/tokens'
+import { COLOR, FONT, LAYOUT } from '@/lib/tokens'
 
 export function AccessSection() {
+  const sns = STORE_INFO.sns
+  const hasSns = !!(sns.instagram || sns.x || sns.tiktok)
+
   return (
     <section
       className="border-t bg-white px-4 py-6 sm:py-10"
@@ -29,6 +33,32 @@ export function AccessSection() {
               電話する {STORE_INFO.contact.tel}
             </LinkButton>
           </div>
+
+          {hasSns && (
+            <div className="flex flex-col items-center gap-2 pt-5">
+              <p className={`${FONT.xs} ${FONT.tracking.wide}`} style={{ color: COLOR.muted }}>FOLLOW</p>
+              <div className="flex items-center justify-center gap-3">
+                {sns.instagram && (
+                  <a
+                    href={sns.instagram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Instagram"
+                    className="block transition hover:opacity-70"
+                  >
+                    <Image
+                      src="/sns/instagram.jpg"
+                      alt="Instagram"
+                      width={36}
+                      height={36}
+                      className="h-9 w-9 rounded-md"
+                      unoptimized
+                    />
+                  </a>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </section>
