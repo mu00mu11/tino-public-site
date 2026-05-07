@@ -43,7 +43,7 @@ export function CastSection({
                     fill
                     sizes={`${SIZE.castPhoto}px`}
                     className={cast.photo_url ? 'object-cover' : 'object-contain p-2'}
-                    unoptimized={!cast.photo_url}
+                    unoptimized
                   />
                   {/* Sho 指示: 当面非表示 (SHOW_CAST_FACE=true で起動) */}
                   {SHOW_CAST_FACE && (() => {
