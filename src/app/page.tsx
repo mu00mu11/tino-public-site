@@ -2,6 +2,7 @@ import { HeroSection } from '@/components/sections/HeroSection'
 import { FloorMapSection } from '@/components/sections/FloorMapSection'
 import { CastSection } from '@/components/sections/CastSection'
 import { CalendarSection } from '@/components/sections/CalendarSection'
+import { InstagramSection } from '@/components/sections/InstagramSection'
 import { AccessSection } from '@/components/sections/AccessSection'
 import { FooterSection } from '@/components/sections/FooterSection'
 import { fetchFloorStatus } from '@/lib/queries/floor'
@@ -40,6 +41,7 @@ export default async function Page() {
       <FloorMapSection initialSeats={seats} />
       <CastSection todayCasts={today} config={config} />
       <CalendarSection stats={stats} />
+      <InstagramSection />
       <AccessSection />
       <FooterSection />
     </main>
