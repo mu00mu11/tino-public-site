@@ -138,13 +138,7 @@ export const TINO_ORIGINAL_CAST_ROW = {
   photo_td: '<td><img style="width:100px; height:100px;" src="img/{slug}.png?330"></td>',
   info_td: '<td><b>{name}</b> ({age?})<br>{schedule}<br>ドリンク：{drink}<br>ショット：{shot}</td>',
   default_photo: 'img/cast.png?330 (TINOロゴプレースホルダ)',
-  observed_2026_05_07: [
-    { name: 'みわ', age: null, schedule: '20:00～4:00', drink: 17, shot: 0, photo: 'cast.png' },
-    { name: 'さやか', age: null, schedule: '0:00～4:00', drink: 7, shot: 2, photo: 'cast.png' },
-    { name: 'しん', age: 27, schedule: '20:00～4:00', drink: 5, shot: 0, photo: 'しん.png' },
-    { name: 'まゆ', age: null, schedule: 'unknown', drink: 0, shot: 0, photo: 'cast.png' },
-    { name: 'りさ', age: null, schedule: 'unknown', drink: 0, shot: 0, photo: 'cast.png' },
-  ],
+  // 観測データ (実キャスト名/出勤情報) はソース外管理: memos/20260507/tino-analysis/
 } as const
 
 // ====================================================================
