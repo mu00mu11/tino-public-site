@@ -22,11 +22,7 @@ export function CastSection({
   config: SiteConfig
 }) {
   if (todayCasts.length === 0) {
-    return (
-      <section className="px-4 py-6 text-center text-sm" style={{ color: COLOR.muted }}>
-        本日の出勤情報は更新中です
-      </section>
-    )
+    return null
   }
 
   const showDrink = config.show_drink_count
