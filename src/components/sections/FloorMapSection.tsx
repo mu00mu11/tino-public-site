@@ -31,11 +31,13 @@ export function FloorMapSection({ initialSeats }: { initialSeats: FloorSeat[] })
   }, [])
 
   const display = seats.length > 0 ? seats : FALLBACK
+  // 物理配置: 左から10卓→1卓の順で並べる（sort_order ASC を表示時に逆順化）
+  const displayReversed = [...display].reverse()
 
   return (
     <section className="px-3 py-3 sm:py-5">
       <div className={`mx-auto flex w-full ${LAYOUT.floorMapMaxW} flex-row flex-nowrap items-end justify-between gap-[1%]`}>
-        {display.map(seat => (
+        {displayReversed.map(seat => (
           <div
             key={seat.seat_id}
             className="relative aspect-[1/2] basis-[8%] grow-0 shrink-0"
