@@ -40,6 +40,8 @@ export function FloorMapSection({ initialSeats }: { initialSeats: FloorSeat[] })
         {displayReversed.map(seat => (
           <div
             key={seat.seat_id}
+            data-seat-id={seat.seat_id}
+            data-sort-order={seat.sort_order}
             className="relative aspect-[1/2] basis-[8%] grow-0 shrink-0"
             aria-label={seat.is_occupied ? '使用中' : '空席'}
           >
