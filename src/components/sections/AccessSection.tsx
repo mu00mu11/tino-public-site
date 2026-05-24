@@ -12,10 +12,12 @@ export function AccessSection() {
       <div className={`mx-auto w-full ${LAYOUT.contentMaxW}`}>
         <SectionHeading>ACCESS</SectionHeading>
         <div className="space-y-3 text-sm">
+          {/* 運営会社は一旦非表示（Sho指示 2026-05-24）。戻す時はこのブロックのコメントを外す
           <div className="text-center">
             <p className="text-xs" style={{ color: COLOR.muted }}>運営</p>
             <p>{STORE_INFO.operator}</p>
           </div>
+          */}
           <div className="text-center">
             <p className="text-xs" style={{ color: COLOR.muted }}>住所</p>
             <p>〒{STORE_INFO.address.postal}</p>
