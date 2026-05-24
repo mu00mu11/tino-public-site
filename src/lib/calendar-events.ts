@@ -6,17 +6,10 @@
  */
 import type { SiteEvent } from '@/lib/types'
 
-/** style → カレンダーセル背景クラス（売上ランクの rank-* を流用） */
+/** style → イベント日セル背景クラス（薄め虹/金。文字は黒太字で重ねる） */
 export function eventBgClass(style: SiteEvent['style']): string {
-  if (style === 'rainbow') return 'rank-rainbow'
-  if (style === 'gold') return 'rank-gold'
-  return ''
-}
-
-/** style → バナー文字グラデクラス（plain は装飾なし） */
-export function eventTextClass(style: SiteEvent['style']): string {
-  if (style === 'rainbow') return 'event-rainbow-text'
-  if (style === 'gold') return 'event-gold-text'
+  if (style === 'rainbow') return 'event-cell-rainbow'
+  if (style === 'gold') return 'event-cell-gold'
   return ''
 }
 

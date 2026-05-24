@@ -1,6 +1,5 @@
 import Image from 'next/image'
 import { COLOR, LAYOUT } from '@/lib/tokens'
-import { EventBanner } from '@/components/ui/EventBanner'
 import { eventsInMonth, eventOnDate, eventBgClass } from '@/lib/calendar-events'
 import type { DailyStats, SiteEvent } from '@/lib/types'
 
@@ -51,8 +50,6 @@ export function CalendarSection({ stats, events = [] }: { stats: DailyStats[]; e
       <div className={`mx-auto w-full ${LAYOUT.calendarMaxW}`}>
         <div className="mb-2 text-center text-sm tracking-wider sm:text-base">{monthLabel}</div>
 
-        {monthEvents.map(ev => <EventBanner key={ev.id} event={ev} />)}
-
         <div className="grid grid-cols-7 border" style={{ borderColor: COLOR.border }}>
           {WEEKDAY_LABELS.map((w, i) => (
             <div
@@ -86,16 +83,17 @@ export function CalendarSection({ stats, events = [] }: { stats: DailyStats[]; e
             const ev = eventOnDate(monthEvents, cell.iso)
             const hideLevel = !!ev?.hide_level
             const hasData = !!stat && stat.level > 0 && !hideLevel
-            // イベント日はイベント背景を優先、それ以外は売上ランク背景
+            // イベント日: 薄め背景クラス / それ以外: 売上ランク背景
             const cellClass = ev ? eventBgClass(ev.style) : (stat ? salesBgClass(stat.bg) : '')
-            const isHighlight = ev ? ev.style !== 'plain' : !!stat?.bg
-            const dateColor = isHighlight
+            // 売上ランク（濃い虹/金）の日だけ日付を白に。イベント日は薄背景なので黒系のまま
+            const isSalesHighlight = !ev && !!stat?.bg
+            const dateColor = isSalesHighlight
               ? '#fff'
               : cell.weekday === 0 ? COLOR.danger
               : cell.weekday === 6 ? COLOR.accent
               : COLOR.fg
             const plainEvent = ev?.style === 'plain'
-            const cellBg = !ev && !hasData && !isFuture && !isHighlight ? COLOR.noBusiness : undefined
+            const cellBg = !ev && !hasData && !isFuture && !isSalesHighlight ? COLOR.noBusiness : undefined
             return (
               <div
                 key={`d-${i}`}
@@ -110,7 +108,23 @@ export function CalendarSection({ stats, events = [] }: { stats: DailyStats[]; e
                 <div className="absolute left-1 top-0.5 text-[9px] sm:text-[10px]" style={{ color: dateColor }}>
                   {cell.date}
                 </div>
-                {hasData && !isFuture ? (
+
+                {ev ? (
+                  // イベント日: タイトルを黒・太字・セルいっぱいの大きめフォントで
+                  <div className="flex h-full flex-col items-center justify-center px-0.5 pt-2">
+                    <span
+                      className="break-words text-center font-bold leading-tight text-sm sm:text-base"
+                      style={{ color: '#000' }}
+                    >
+                      {ev.title}
+                    </span>
+                    {!hideLevel && hasData && !isFuture ? (
+                      <span className="mt-0.5 text-[9px] leading-none" style={{ color: COLOR.fg }}>
+                        {stat!.guest_count}人
+                      </span>
+                    ) : null}
+                  </div>
+                ) : hasData && !isFuture ? (
                   <div className="flex h-full flex-col items-center justify-center pt-2">
                     <div className="relative aspect-square w-[55%] max-w-[30px]">
                       <Image
@@ -124,7 +138,7 @@ export function CalendarSection({ stats, events = [] }: { stats: DailyStats[]; e
                     </div>
                     <span
                       className="text-[9px] leading-none sm:text-[10px]"
-                      style={{ color: isHighlight ? '#fff' : COLOR.fg }}
+                      style={{ color: isSalesHighlight ? '#fff' : COLOR.fg }}
                     >
                       {stat!.guest_count}人
                     </span>
