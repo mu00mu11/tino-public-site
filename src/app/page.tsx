@@ -8,6 +8,7 @@ import { FooterSection } from '@/components/sections/FooterSection'
 import { fetchFloorStatus } from '@/lib/queries/floor'
 import { fetchTodayAttendance } from '@/lib/queries/casts'
 import { fetchDailyStats } from '@/lib/queries/stats'
+import { fetchSiteEvents } from '@/lib/queries/events'
 import { fetchSiteConfig } from '@/lib/queries/config'
 import { COLOR } from '@/lib/tokens'
 
@@ -15,10 +16,11 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 export default async function Page() {
-  const [seats, today, stats, config] = await Promise.all([
+  const [seats, today, stats, events, config] = await Promise.all([
     fetchFloorStatus(),
     fetchTodayAttendance(),
     fetchDailyStats(),
+    fetchSiteEvents(),
     fetchSiteConfig(),
   ])
 
@@ -40,7 +42,7 @@ export default async function Page() {
       <HeroSection />
       <FloorMapSection initialSeats={seats} />
       <CastSection todayCasts={today} config={config} />
-      <CalendarSection stats={stats} />
+      {config.show_calendar && <CalendarSection stats={stats} events={events} />}
       <InstagramSection />
       <AccessSection />
       <FooterSection />

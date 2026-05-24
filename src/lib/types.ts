@@ -50,6 +50,19 @@ export type DailyStats = {
   bg: 'rainbow' | 'gold' | null
 }
 
+export type SiteEvent = {
+  id: string
+  title: string
+  emoji: string | null
+  start_date: string   // 'YYYY-MM-DD'
+  end_date: string     // 'YYYY-MM-DD'
+  /** 'rainbow'=虹色 / 'gold'=金色 / 'plain'=装飾なし */
+  style: 'rainbow' | 'gold' | 'plain'
+  /** 期間中はカレンダーの結果ニコ(level画像)を隠す */
+  hide_level: boolean
+  sort_order: number
+}
+
 export type SiteConfig = {
   is_published: boolean
   calendar_thresholds: {
@@ -57,4 +70,6 @@ export type SiteConfig = {
   }
   show_drink_count: boolean
   show_shot_count: boolean
+  /** カレンダーセクションの表示ON/OFF（マスタHP設定で切替） */
+  show_calendar: boolean
 }

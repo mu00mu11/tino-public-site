@@ -1,6 +1,8 @@
 import Image from 'next/image'
 import { COLOR, LAYOUT } from '@/lib/tokens'
-import type { DailyStats } from '@/lib/types'
+import { EventBanner } from '@/components/ui/EventBanner'
+import { eventsInMonth, eventOnDate, eventBgClass } from '@/lib/calendar-events'
+import type { DailyStats, SiteEvent } from '@/lib/types'
 
 const WEEKDAY_LABELS = ['日', '月', '火', '水', '木', '金', '土']
 
@@ -28,13 +30,13 @@ function buildMonthGrid(year: number, month0: number) {
   return cells
 }
 
-function bgClass(bg: DailyStats['bg']): string {
+function salesBgClass(bg: DailyStats['bg']): string {
   if (bg === 'rainbow') return 'rank-rainbow'
   if (bg === 'gold') return 'rank-gold'
   return ''
 }
 
-export function CalendarSection({ stats }: { stats: DailyStats[] }) {
+export function CalendarSection({ stats, events = [] }: { stats: DailyStats[]; events?: SiteEvent[] }) {
   const today = new Date()
   const year = today.getFullYear()
   const month0 = today.getMonth()
@@ -42,11 +44,15 @@ export function CalendarSection({ stats }: { stats: DailyStats[] }) {
   const statsMap = new Map(stats.map(s => [s.business_date, s]))
   const monthLabel = `${year}年${month0 + 1}月`
   const todayIso = `${year}-${String(month0 + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+  const monthEvents = eventsInMonth(events, year, month0)
 
   return (
     <section className="px-3 py-5 sm:py-8">
       <div className={`mx-auto w-full ${LAYOUT.calendarMaxW}`}>
         <div className="mb-2 text-center text-sm tracking-wider sm:text-base">{monthLabel}</div>
+
+        {monthEvents.map(ev => <EventBanner key={ev.id} event={ev} />)}
+
         <div className="grid grid-cols-7 border" style={{ borderColor: COLOR.border }}>
           {WEEKDAY_LABELS.map((w, i) => (
             <div
@@ -77,20 +83,29 @@ export function CalendarSection({ stats }: { stats: DailyStats[] }) {
             }
             const stat = statsMap.get(cell.iso)
             const isFuture = cell.iso > todayIso
-            const hasData = !!stat && stat.level > 0
-            const cellClass = stat ? bgClass(stat.bg) : ''
-            const isHighlight = !!stat?.bg
+            const ev = eventOnDate(monthEvents, cell.iso)
+            const hideLevel = !!ev?.hide_level
+            const hasData = !!stat && stat.level > 0 && !hideLevel
+            // イベント日はイベント背景を優先、それ以外は売上ランク背景
+            const cellClass = ev ? eventBgClass(ev.style) : (stat ? salesBgClass(stat.bg) : '')
+            const isHighlight = ev ? ev.style !== 'plain' : !!stat?.bg
             const dateColor = isHighlight
               ? '#fff'
               : cell.weekday === 0 ? COLOR.danger
               : cell.weekday === 6 ? COLOR.accent
               : COLOR.fg
-            const cellBg = !hasData && !isFuture && !isHighlight ? COLOR.noBusiness : undefined
+            const plainEvent = ev?.style === 'plain'
+            const cellBg = !ev && !hasData && !isFuture && !isHighlight ? COLOR.noBusiness : undefined
             return (
               <div
                 key={`d-${i}`}
                 className={`relative aspect-square overflow-hidden ${cellClass}`}
-                style={{ background: cellBg, borderRight, borderBottom }}
+                style={{
+                  background: cellBg,
+                  borderRight,
+                  borderBottom,
+                  boxShadow: plainEvent ? `inset 0 0 0 2px ${COLOR.accent}` : undefined,
+                }}
               >
                 <div className="absolute left-1 top-0.5 text-[9px] sm:text-[10px]" style={{ color: dateColor }}>
                   {cell.date}
@@ -99,8 +114,8 @@ export function CalendarSection({ stats }: { stats: DailyStats[] }) {
                   <div className="flex h-full flex-col items-center justify-center pt-2">
                     <div className="relative aspect-square w-[55%] max-w-[30px]">
                       <Image
-                        src={`/result/result${stat.level}.png`}
-                        alt={`level ${stat.level}`}
+                        src={`/result/result${stat!.level}.png`}
+                        alt={`level ${stat!.level}`}
                         fill
                         sizes="30px"
                         className="object-contain"
@@ -111,7 +126,7 @@ export function CalendarSection({ stats }: { stats: DailyStats[] }) {
                       className="text-[9px] leading-none sm:text-[10px]"
                       style={{ color: isHighlight ? '#fff' : COLOR.fg }}
                     >
-                      {stat.guest_count}人
+                      {stat!.guest_count}人
                     </span>
                   </div>
                 ) : null}

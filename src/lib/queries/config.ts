@@ -7,12 +7,13 @@ const FALLBACK: SiteConfig = {
   calendar_thresholds: DEFAULT_THRESHOLDS,
   show_drink_count: false,
   show_shot_count: false,
+  show_calendar: true,
 }
 
 export async function fetchSiteConfig(): Promise<SiteConfig> {
   const { data, error } = await supabase
     .from('public_site_config_view')
-    .select('is_published, calendar_thresholds, show_drink_count, show_shot_count')
+    .select('is_published, calendar_thresholds, show_drink_count, show_shot_count, show_calendar')
     .limit(1)
     .maybeSingle()
   if (error) {
