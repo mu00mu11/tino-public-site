@@ -56,8 +56,12 @@ export type SiteEvent = {
   emoji: string | null
   start_date: string   // 'YYYY-MM-DD'
   end_date: string     // 'YYYY-MM-DD'
-  /** 'rainbow'=虹色 / 'gold'=金色 / 'plain'=装飾なし */
-  style: 'rainbow' | 'gold' | 'plain'
+  /** 背景色パレットキー（event-palette.ts 参照） */
+  bg_color: string
+  /** 文字色パレットキー（event-palette.ts 参照） */
+  text_color: string
+  /** フォントサイズ 'sm' | 'md' | 'lg' */
+  font_size: string
   /** 期間中はカレンダーの結果ニコ(level画像)を隠す */
   hide_level: boolean
   sort_order: number

@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import { COLOR, LAYOUT } from '@/lib/tokens'
-import { eventsInMonth, eventOnDate, eventBgClass } from '@/lib/calendar-events'
+import { eventsInMonth, eventOnDate } from '@/lib/calendar-events'
+import { bgClassOf, bgColorOf, textClassOf, textColorOf, fontSizeClassOf } from '@/lib/event-palette'
 import type { DailyStats, SiteEvent } from '@/lib/types'
 
 const WEEKDAY_LABELS = ['日', '月', '火', '水', '木', '金', '土']
@@ -83,38 +84,35 @@ export function CalendarSection({ stats, events = [] }: { stats: DailyStats[]; e
             const ev = eventOnDate(monthEvents, cell.iso)
             const hideLevel = !!ev?.hide_level
             const hasData = !!stat && stat.level > 0 && !hideLevel
-            // イベント日: 薄め背景クラス / それ以外: 売上ランク背景
-            const cellClass = ev ? eventBgClass(ev.style) : (stat ? salesBgClass(stat.bg) : '')
-            // 売上ランク（濃い虹/金）の日だけ日付を白に。イベント日は薄背景なので黒系のまま
+            // イベント日: パレット背景 / それ以外: 売上ランク背景
+            const cellClass = ev ? bgClassOf(ev.bg_color) : (stat ? salesBgClass(stat.bg) : '')
+            const eventCellBg = ev ? bgColorOf(ev.bg_color) : undefined
+            // 売上ランク（濃い虹/金）の日だけ日付を白に
             const isSalesHighlight = !ev && !!stat?.bg
             const dateColor = isSalesHighlight
               ? '#fff'
               : cell.weekday === 0 ? COLOR.danger
               : cell.weekday === 6 ? COLOR.accent
               : COLOR.fg
-            const plainEvent = ev?.style === 'plain'
-            const cellBg = !ev && !hasData && !isFuture && !isSalesHighlight ? COLOR.noBusiness : undefined
+            const cellBg = ev
+              ? eventCellBg
+              : (!hasData && !isFuture && !isSalesHighlight ? COLOR.noBusiness : undefined)
             return (
               <div
                 key={`d-${i}`}
                 className={`relative aspect-square overflow-hidden ${cellClass}`}
-                style={{
-                  background: cellBg,
-                  borderRight,
-                  borderBottom,
-                  boxShadow: plainEvent ? `inset 0 0 0 2px ${COLOR.accent}` : undefined,
-                }}
+                style={{ background: cellBg, borderRight, borderBottom }}
               >
                 <div className="absolute left-1 top-0.5 text-[9px] sm:text-[10px]" style={{ color: dateColor }}>
                   {cell.date}
                 </div>
 
                 {ev ? (
-                  // イベント日: タイトルを黒・太字・セルいっぱいの大きめフォントで
+                  // イベント日: タイトルを選択色・太字・選択サイズで表示
                   <div className="flex h-full flex-col items-center justify-center px-0.5 pt-2">
                     <span
-                      className="break-words text-center font-bold leading-tight text-sm sm:text-base"
-                      style={{ color: '#000' }}
+                      className={`break-words text-center font-bold ${fontSizeClassOf(ev.font_size)} ${textClassOf(ev.text_color)}`}
+                      style={{ color: textColorOf(ev.text_color) }}
                     >
                       {ev.title}
                     </span>

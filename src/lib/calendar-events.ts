@@ -1,17 +1,10 @@
 /**
- * calendar-events.ts — カレンダーイベント（アニバーサリー）の純ロジック
+ * calendar-events.ts — カレンダーイベントの期間判定（純ロジック）
  *
- * 表示色は globals.css の rank-* / event-*-text クラスに集約（gradient定義の真ソース）。
- * ここではクラス名のマッピングと日付範囲判定のみを持つ（描画なし・テスト容易）。
+ * 色・サイズのマッピングは event-palette.ts、CSSグラデは globals.css に集約。
+ * ここは日付範囲の抽出のみ（描画なし・テスト容易）。
  */
 import type { SiteEvent } from '@/lib/types'
-
-/** style → イベント日セル背景クラス（薄め虹/金。文字は黒太字で重ねる） */
-export function eventBgClass(style: SiteEvent['style']): string {
-  if (style === 'rainbow') return 'event-cell-rainbow'
-  if (style === 'gold') return 'event-cell-gold'
-  return ''
-}
 
 /** 指定月（month0 は 0-indexed）に期間が重なるイベントのみ抽出 */
 export function eventsInMonth(events: SiteEvent[], year: number, month0: number): SiteEvent[] {

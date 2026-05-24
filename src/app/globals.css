@@ -61,3 +61,19 @@ body {
     rgba(254, 233, 160, 0.55) 55%,
     rgba(182, 123, 3, 0.30));
 }
+
+/* 文字色を虹色グラデにする（背景=白等のとき映える） */
+.event-text-rainbow {
+  background-image: linear-gradient(90deg,
+    #ff6161, #e9b22d 20%, #c0ca4b 36%, #35b338 58%, #566ef3 78%, #9a27ee);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+/* 文字色を金グラデに */
+.event-text-gold {
+  background-image: linear-gradient(90deg, #b67b03, #daaf08 45%, #fee9a0 70%, #daaf08 85%, #b67b03);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}

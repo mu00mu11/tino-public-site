@@ -8,7 +8,7 @@ import type { SiteEvent } from '@/lib/types'
 export async function fetchSiteEvents(): Promise<SiteEvent[]> {
   const { data, error } = await supabase
     .from('public_site_events_view')
-    .select('id, title, emoji, start_date, end_date, style, hide_level, sort_order')
+    .select('id, title, emoji, start_date, end_date, bg_color, text_color, font_size, hide_level, sort_order')
     .order('sort_order', { ascending: true })
     .order('start_date', { ascending: true })
   if (error) {
