@@ -2,6 +2,7 @@ import { HeroSection } from '@/components/sections/HeroSection'
 import { FloorMapSection } from '@/components/sections/FloorMapSection'
 import { CastSection } from '@/components/sections/CastSection'
 import { CalendarSection } from '@/components/sections/CalendarSection'
+import { CalendarPopup } from '@/components/ui/CalendarPopup'
 import { InstagramSection } from '@/components/sections/InstagramSection'
 import { AccessSection } from '@/components/sections/AccessSection'
 import { FooterSection } from '@/components/sections/FooterSection'
@@ -42,6 +43,7 @@ export default async function Page() {
       <HeroSection />
       <FloorMapSection initialSeats={seats} />
       <CastSection todayCasts={today} config={config} />
+      <CalendarPopup config={config} />
       {config.show_calendar && <CalendarSection stats={stats} events={events} />}
       <InstagramSection />
       <AccessSection />

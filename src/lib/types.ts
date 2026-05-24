@@ -76,4 +76,12 @@ export type SiteConfig = {
   show_shot_count: boolean
   /** カレンダーセクションの表示ON/OFF（マスタHP設定で切替） */
   show_calendar: boolean
+  /** カレンダー上部ポップ画像（公開URLに解決済み・未設定はnull） */
+  calendar_popup_url: string | null
+  /** ポップ画像の表示ON/OFF */
+  calendar_popup_enabled: boolean
+  /** 表示開始日 'YYYY-MM-DD'（null=制限なし） */
+  calendar_popup_start_date: string | null
+  /** 表示終了日 'YYYY-MM-DD'（null=制限なし） */
+  calendar_popup_end_date: string | null
 }
