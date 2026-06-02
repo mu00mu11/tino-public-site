@@ -81,6 +81,8 @@ export function CalendarSection({ stats, events = [] }: { stats: DailyStats[]; e
             }
             const stat = statsMap.get(cell.iso)
             const isFuture = cell.iso > todayIso
+            // 灰色(営業外)は「過去の休みの日」だけ。今日はデータが溜まるまで白＝営業中に見せる
+            const isPast = cell.iso < todayIso
             const ev = eventOnDate(monthEvents, cell.iso)
             const hideLevel = !!ev?.hide_level
             const hasData = !!stat && stat.level > 0 && !hideLevel
@@ -96,7 +98,7 @@ export function CalendarSection({ stats, events = [] }: { stats: DailyStats[]; e
               : COLOR.fg
             const cellBg = ev
               ? eventCellBg
-              : (!hasData && !isFuture && !isSalesHighlight ? COLOR.noBusiness : undefined)
+              : (!hasData && isPast && !isSalesHighlight ? COLOR.noBusiness : undefined)
             return (
               <div
                 key={`d-${i}`}

@@ -16,6 +16,20 @@
 | カレンダー営業外セル背景 | `COLOR.noBusiness` | `rgb(220,220,220)` |
 | フッター背景 | `COLOR.copyrightBg` | `#000000` |
 
+### 順位枠（本日出勤キャスト）
+
+ドリンク/ショット/シャンパンの合計スコア上位に色枠を付ける。`RANK_FRAME`（`tokens.ts`）と `cast-rank.ts` の `RankFrameKey` が1:1対応。
+
+| 順位 | キー | 値 |
+|------|------|-----|
+| 1位 | `RANK_FRAME.rainbow` | パステル虹 `linear-gradient(...)` |
+| 2位 | `RANK_FRAME.gold` | `#d4af37` |
+| 3位 | `RANK_FRAME.silver` | `#c0c0c0` |
+| 4位 | `RANK_FRAME.bronze` | `#cd7f32` |
+| 5位以下 | — | 枠なし |
+
+枠幅は `RANK_FRAME_WIDTH`（3px）。スコア式・しきい値は `cast-rank.ts`（シャンパン=ボトル×5）。
+
 ```tsx
 // NG
 <div style={{ color: '#6b7280' }} />

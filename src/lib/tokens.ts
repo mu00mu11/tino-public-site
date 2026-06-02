@@ -61,3 +61,18 @@ export const SIZE = {
   seatIcon: { w: 25, h: 50 },              // 実物 25x50 と一致
   resultIcon: 30,                          // 実物 30x30 と一致
 } as const
+
+/**
+ * 本日出勤キャストの順位枠（写真の外側に額縁として描く背景）
+ * 1位=パステル虹 / 2位=金 / 3位=銀 / 4位=銅。5位以下は枠なし。
+ * cast-rank.ts の RankFrameKey と1:1で対応させる。
+ */
+export const RANK_FRAME = {
+  rainbow: 'linear-gradient(135deg,#ff9aa2,#ffd8a8,#fdffb6,#caffbf,#9bf6ff,#bdb2ff,#ffc6ff)',
+  gold: '#d4af37',
+  silver: '#c0c0c0',
+  bronze: '#cd7f32',
+} as const
+
+/** 順位枠の太さ(px)。写真の外側に出す額縁幅 */
+export const RANK_FRAME_WIDTH = 3
