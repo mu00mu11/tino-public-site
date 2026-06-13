@@ -1,0 +1,71 @@
+{
+  "name_jp": "TINO",
+  "name_en": "Girl's Bar TINO",
+  "operator": "合同会社 M.I.L.S",
+  "genre": "ガールズバー",
+
+  "address": {
+    "postal": "170-0005",
+    "full": "東京都豊島区南大塚3-53-3 万葉ビル",
+    "lat": null,
+    "lng": null,
+    "maps_url": "https://maps.app.goo.gl/LQ5HEhaRiWxTTj2YA"
+  },
+
+  "contact": {
+    "tel": "070-8565-7142",
+    "tel_link": "tel:07085657142",
+    "email": null
+  },
+
+  "hours": {
+    "show": false,
+    "_note": "Sho判断：営業時間欄は表示しない"
+  },
+
+  "sns": {
+    "instagram": "TBD（Sho入手予定）",
+    "x": null,
+    "tiktok": null,
+    "line": null,
+    "youtube": null
+  },
+
+  "branding": {
+    "logo_file": "logo/logo.jpg",
+    "primary_color": "#FFFFFF",
+    "accent_color": "#1B2244",
+    "danger_color": "#C8102E",
+    "text_color": "#000000",
+    "font_family": "'Hiragino Kaku Gothic Pro', 'ヒラギノ角ゴ Pro W3', メイリオ, Meiryo, 'ＭＳ Ｐゴシック', sans-serif",
+    "_note": "実物完コピ：白背景＋黒文字＋ヒラギノ。ロゴは紺TINO＋赤手書きGirl's Bar"
+  },
+
+  "site": {
+    "public_visible": false,
+    "show_calendar": true,
+    "show_calendar_past": false,
+    "show_drink_count": false,
+    "show_shot_count": false,
+    "show_ranking": false,
+    "show_future_features": false,
+    "domain": null,
+    "vercel_project": null,
+    "github_repo": null,
+    "_note": "実物の機能踏襲（ranking/calendar_past/drink/shot count 全部非表示）。show_future_features=false=タブ/詳細/SNS等の拡張UIは現時点で出さない"
+  },
+
+  "seat_icons": {
+    "occupied": "seat-icons/cat-occupied.jpg",
+    "empty": "seat-icons/chair-empty.jpg",
+    "icon_width": 40,
+    "icon_height": 80,
+    "_note": "Sho提供素材（猫＝客いる席／空椅子＝空席）。フロアマップ上の絶対座標に配置"
+  },
+
+  "purpose": {
+    "primary": "集客（新規）",
+    "secondary": "常連の応援動機を作る・行こうかなと思わせる",
+    "tertiary": "キャストモチベ向上（自分のページが活きてる感覚）"
+  }
+}
