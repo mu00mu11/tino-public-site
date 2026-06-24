@@ -11,18 +11,20 @@ import { fetchTodayAttendance } from '@/lib/queries/casts'
 import { fetchDailyStats } from '@/lib/queries/stats'
 import { fetchSiteEvents } from '@/lib/queries/events'
 import { fetchSiteConfig } from '@/lib/queries/config'
+import { fetchSitePopups } from '@/lib/queries/popups'
 import { COLOR } from '@/lib/tokens'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 export default async function Page() {
-  const [seats, today, stats, events, config] = await Promise.all([
+  const [seats, today, stats, events, config, popups] = await Promise.all([
     fetchFloorStatus(),
     fetchTodayAttendance(),
     fetchDailyStats(),
     fetchSiteEvents(),
     fetchSiteConfig(),
+    fetchSitePopups(),
   ])
 
   if (!config.is_published) {
@@ -43,7 +45,7 @@ export default async function Page() {
       <HeroSection />
       <FloorMapSection initialSeats={seats} />
       <CastSection todayCasts={today} config={config} />
-      <CalendarPopup config={config} />
+      <CalendarPopup popups={popups} />
       {config.show_calendar && <CalendarSection stats={stats} events={events} />}
       <InstagramSection />
       <AccessSection />
