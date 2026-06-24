@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase'
+import { STORE_CODE } from '@/lib/storeFilter'
 import type { SiteEvent } from '@/lib/types'
 
 /**
@@ -6,9 +7,11 @@ import type { SiteEvent } from '@/lib/types'
  * 機密データなし。公開ビュー public_site_events_view 経由（anon SELECT 可）。
  */
 export async function fetchSiteEvents(): Promise<SiteEvent[]> {
-  const { data, error } = await supabase
+  let query = supabase
     .from('public_site_events_view')
     .select('id, title, emoji, start_date, end_date, bg_color, text_color, font_size, hide_level, sort_order')
+  if (STORE_CODE) query = query.eq('store_code', STORE_CODE)
+  const { data, error } = await query
     .order('sort_order', { ascending: true })
     .order('start_date', { ascending: true })
   if (error) {

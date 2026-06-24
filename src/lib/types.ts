@@ -35,10 +35,14 @@ export type TodayAttendance = {
   display_age: number | null
   photo_url: string | null
   clock_in: string | null
+  /** 退勤時刻 HH:MM（未退勤 / 常時表示タグは null） */
+  clock_out: string | null
   is_active: boolean
   drink_count: number
   shot_count: number
   bottle_count: number
+  /** 並び順（公開ビューの cpp.sort_order） */
+  sort_order: number
 }
 
 export type DailyStats = {

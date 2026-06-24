@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase'
+import { STORE_CODE } from '@/lib/storeFilter'
 import type { SiteConfig } from '@/lib/types'
 import { DEFAULT_THRESHOLDS } from '@/lib/thresholds'
 
@@ -25,11 +26,11 @@ const FALLBACK: SiteConfig = {
 }
 
 export async function fetchSiteConfig(): Promise<SiteConfig> {
-  const { data, error } = await supabase
+  let query = supabase
     .from('public_site_config_view')
     .select('is_published, calendar_thresholds, show_drink_count, show_shot_count, show_calendar, calendar_popup_url, calendar_popup_enabled, calendar_popup_start_date, calendar_popup_end_date')
-    .limit(1)
-    .maybeSingle()
+  if (STORE_CODE) query = query.eq('store_code', STORE_CODE)
+  const { data, error } = await query.limit(1).maybeSingle()
   if (error) {
     console.error('[fetchSiteConfig]', error.message, error.code)
     return FALLBACK

@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase'
+import { STORE_CODE } from '@/lib/storeFilter'
 import type { TodayAttendance, PublicCast } from '@/lib/types'
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
@@ -15,9 +16,11 @@ function resolvePhotoUrl(p: string | null): string | null {
 }
 
 export async function fetchTodayAttendance(): Promise<TodayAttendance[]> {
-  const { data, error } = await supabase
+  let query = supabase
     .from('public_today_attendance_view')
-    .select('slug, display_name, display_age, photo_url, clock_in, is_active, drink_count, shot_count, bottle_count')
+    .select('slug, display_name, display_age, photo_url, clock_in, clock_out, is_active, drink_count, shot_count, bottle_count, sort_order')
+  if (STORE_CODE) query = query.eq('store_code', STORE_CODE)
+  const { data, error } = await query.order('sort_order', { ascending: true })
   if (error) {
     console.error('[fetchTodayAttendance]', error.message, error.code)
     return []
@@ -26,10 +29,11 @@ export async function fetchTodayAttendance(): Promise<TodayAttendance[]> {
 }
 
 export async function fetchPublicCasts(): Promise<PublicCast[]> {
-  const { data, error } = await supabase
+  let query = supabase
     .from('public_casts_view')
     .select('cast_id, slug, display_name, display_age, bio, photo_url, sns_instagram, sns_x, sns_tiktok, sort_order')
-    .order('sort_order', { ascending: true })
+  if (STORE_CODE) query = query.eq('store_code', STORE_CODE)
+  const { data, error } = await query.order('sort_order', { ascending: true })
   if (error) {
     console.error('[fetchPublicCasts]', error.message, error.code)
     return []

@@ -75,7 +75,13 @@ function CastInfo({
         <b>{cast.display_name}</b>
         {cast.display_age != null && <> ({cast.display_age})</>}
       </div>
-      {cast.clock_in && <div className={FONT.sm}>出勤 {cast.clock_in}〜</div>}
+      {/* 常時表示タグ(山田等)は clock_in が null → 時刻を一切出さない。
+          出勤中=「出勤 HH:MM〜」/ 退勤済=「出勤 HH:MM〜HH:MM」 */}
+      {cast.clock_in && (
+        <div className={FONT.sm}>
+          出勤 {cast.clock_in}〜{cast.clock_out ?? ''}
+        </div>
+      )}
       {showDrink && <div className={FONT.sm}>ドリンク：{cast.drink_count}</div>}
       {showShot && <div className={FONT.sm}>ショット：{cast.shot_count}</div>}
       {cast.bottle_count > 0 && <div className={FONT.sm}>ボトル：{cast.bottle_count}</div>}
